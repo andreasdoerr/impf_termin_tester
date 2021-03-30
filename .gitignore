@@ -1,0 +1,12 @@
+# general python
+*.pyc
+__pycache__
+.cache
+
+# setup
+.eggs
+*.egg-info
+
+# IDE specific
+.spyproject
+.vscode

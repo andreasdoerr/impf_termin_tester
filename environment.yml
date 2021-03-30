@@ -1,0 +1,10 @@
+name: impf_termin_tester
+dependencies:
+  - python>=3.6
+  - pip
+  - urllib3
+  - Pillow
+  - pywin32
+  - pip:
+    - selenium
+    

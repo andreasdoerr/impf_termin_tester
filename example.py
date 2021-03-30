@@ -1,6 +1,3 @@
-from urllib3 import ProxyManager
-from urllib3.util import make_headers
-
 from impf_termin_tester.browser import Browser
 from impf_termin_tester.runner import Runner
 
@@ -27,7 +24,7 @@ if __name__ == "__main__":
 
     # Create notifiers
     notifiers = [
-        PushSaferNotification(pushsafer_private_key, https),
+        PushSaferNotification(pushsafer_private_key),
         OutlookNotification(email),
         FileNotification(output_dir),
     ]

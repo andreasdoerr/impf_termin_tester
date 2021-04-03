@@ -50,9 +50,7 @@ class Runner:
         print("*" * 80)
         print("   RESULT: Appointments available", flush=True)
         print("*" * 80)
-        import pdb
 
-        pdb.set_trace()
         for notifier in self.notifiers:
             print(f" - Sent notification: {notifier.name} ... ", end=" ", flush=True)
             success = notifier.sent_notification(result)

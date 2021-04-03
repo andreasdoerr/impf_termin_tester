@@ -1,9 +1,10 @@
 # Impf-Termin-Tester
 
-This repository provides a tool to automatically query the website of the
-German vaccination program. With a given registration code, this tool detects
-if appointments for vaccinations become available. Different notification 
-channels (e.g. e-mail or push notification) are provided to notify the user.
+This repository provides a tool to automatically query the website of the German vaccination program.
+
+With a given registration code, this tool detects if appointments for vaccinations become available.
+
+Different notification channels (e.g. e-mail or push notification) are provided to notify the user.
 
 ## Contributors
 
@@ -33,15 +34,16 @@ should be in the format
 ```
 "https://XXX-iz.impfterminservice.de/impftermine/suche/XXXX-XXXX-XXXX/YYYYY/"
 ```
-The tool will iteratively query each individual vacination side to check for 
+The tool will iteratively query each individual vaccination side to check for
 available appointments.
 
 ### Setup Browser Automation
 
 The tool is currently based on the selenium browser automation package to control
 the Chrome browser. The paths to the browser executable and the corresponding
-browser driver need to be set in the [example.py](example.py). More information on
-the installation of Selenium and the required executables can be found in
+browser driver need to be set in the [example.py](example.py).
+
+More information on the installation of Selenium and the required executables can be found in
 [Selenium installation](https://selenium-python.readthedocs.io/installation.html#drivers)).
 
 ### Setup Notification Channels
@@ -54,6 +56,7 @@ The tool can take a list of notification channels. Currently this includes
  
 For each channel, specific details (e.g. target e-mail address, output-folder, etc.)
 are required to be filled into the [example.py](example.py).
+
 For further information about the push notification channel check out the
 https://www.pushsafer.com/ service.
 

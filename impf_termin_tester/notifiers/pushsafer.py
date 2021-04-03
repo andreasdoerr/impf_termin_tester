@@ -37,8 +37,8 @@ class PushSaferNotification(NotificationService):
     def initialize(self):
         self.https = self.https or urllib3.PoolManager()
 
-    def _sent_notification(self, result):
-        """ Sent out the pushsafer.com post request to trigger the notification """
+    def _send_notification(self, result):
+        """ Send out the pushsafer.com post request to trigger the notification """
         post_fields = {
             "t": "Appointment available!",
             "m": "Check website for more details.",

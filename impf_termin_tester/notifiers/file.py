@@ -15,7 +15,7 @@ class FileNotification(NotificationService):
         if not os.path.exists(self.output_dir):
             os.mkdir(self.output_dir)
 
-    def _sent_notification(self, result):
+    def _send_notification(self, result):
         # Create unique filename with registration code and time
         code_str = result.url.strip("/").split("/")[-2].replace("-", "_")
         date_str = result.time.strftime("%Y%m%d_%H%M")

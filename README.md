@@ -24,7 +24,7 @@ pip install -e .
 
 ## Running
 
-A example script for running the impf-termin-tester is available in `example.py`.
+A example script for running the impf-termin-tester is available in [example.py](example.py).
 
 ### Vaccination Website URLs
 
@@ -40,7 +40,7 @@ available appointments.
 
 The tool is currently based on the selenium browser automation package to control
 the Chrome browser. The paths to the browser executable and the corresponding
-browser driver need to be set in the `example.py`. More information on
+browser driver need to be set in the [example.py](example.py). More information on
 the installation of Selenium and the required executables can be found in
 [Selenium installation](https://selenium-python.readthedocs.io/installation.html#drivers)).
 
@@ -53,9 +53,18 @@ The tool can take a list of notification channels. Currently this includes
  * Disk export (writing screenshot and website to the hard-disk)
  
 For each channel, specific details (e.g. target e-mail address, output-folder, etc.)
-are required to be filled into the `example.py`.
+are required to be filled into the [example.py](example.py).
 For further information about the push notification channel check out the
 https://www.pushsafer.com/ service.
+
+#### Outlook E-Mail Notification (Windows ONLY)
+
+Notifications can be send via Outlook e-mails. This currently requires the
+`pywin32` package for the Windows OS. This package can be installed via
+```
+conda install pywin32
+```
+An example for instantiating the `OutlookNotification` can be found in the [example.py](example.py).
 
 ## References
 

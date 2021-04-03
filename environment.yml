@@ -4,7 +4,6 @@ dependencies:
   - pip
   - urllib3
   - Pillow
-  - pywin32
   - pip:
     - selenium
     

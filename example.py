@@ -3,8 +3,11 @@ from impf_termin_tester.runner import Runner
 
 from impf_termin_tester.notifiers.mail import MailNotification
 from impf_termin_tester.notifiers.pushsafer import PushSaferNotification
-from impf_termin_tester.notifiers.outlook import OutlookNotification
 from impf_termin_tester.notifiers.file import FileNotification
+
+# OutlookNotification is based on pywin32 and thus Windows only
+# Check README.md for setup instrunctions
+# from impf_termin_tester.notifiers.outlook import OutlookNotification
 
 
 if __name__ == "__main__":
@@ -31,7 +34,7 @@ if __name__ == "__main__":
     notifiers = [
         MailNotification(email, mail_server, login_user, login_password),
         PushSaferNotification(pushsafer_private_key),
-        OutlookNotification(email),
+        # OutlookNotification(email),    # Windows only, requiers pywin32
         FileNotification(output_dir),
     ]
 

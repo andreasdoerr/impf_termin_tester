@@ -49,7 +49,7 @@ the installation of Selenium and the required executables can be found in
 The tool can take a list of notification channels. Currently this includes
 
  * Push notifications (via the https://www.pushsafer.com/ service)
- * E-Mail notifications (via Windows Outlook API)
+ * E-Mail notifications (via SMTP or Windows Outlook API)
  * Disk export (writing screenshot and website to the hard-disk)
  
 For each channel, specific details (e.g. target e-mail address, output-folder, etc.)

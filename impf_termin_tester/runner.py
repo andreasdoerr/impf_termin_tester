@@ -53,7 +53,7 @@ class Runner:
 
         for notifier in self.notifiers:
             print(f" - Sent notification: {notifier.name} ... ", end=" ", flush=True)
-            success = notifier.sent_notification(result)
+            success = notifier.send_notification(result)
             if success:
                 print("Success.", flush=True)
             else:

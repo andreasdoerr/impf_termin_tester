@@ -12,7 +12,7 @@ class OutlookNotification(NotificationService):
     def initialize(self):
         self.outlook = win32.Dispatch("outlook.application")
 
-    def _sent_notification(self, result):
+    def _send_notification(self, result):
         mail = self.outlook.CreateItem(0)
         mail.To = self.target_email
         mail.Subject = "Appointment available"

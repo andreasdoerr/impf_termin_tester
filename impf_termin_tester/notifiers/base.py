@@ -9,12 +9,12 @@ class NotificationService:
     def initialize(self):
         pass
 
-    def sent_notification(self, result):
+    def send_notification(self, result):
         try:
-            return self._sent_notification(result)
+            return self._send_notification(result)
         except:
             return False
 
     @abc.abstractmethod
-    def _sent_notification(self, result):
+    def _send_notification(self, result):
         return True

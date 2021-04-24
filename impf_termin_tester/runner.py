@@ -23,9 +23,9 @@ class Runner:
         logging.info("-" * 80)
 
         # Initialize browser
-        logging.info(f" - Initialize: Browser ...", end=" ")
+        logging.info(f" - Initialize: Browser.")
         self.browser.initialize()
-        logging.info("Done")
+        logging.info("   Done")
 
         # Initialize all notification channels
         for notifier in self.notifiers:

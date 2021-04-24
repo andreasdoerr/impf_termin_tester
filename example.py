@@ -1,3 +1,5 @@
+import logging
+
 from impf_termin_tester.browser import Browser
 from impf_termin_tester.runner import Runner
 
@@ -12,9 +14,12 @@ from impf_termin_tester.notifiers.file import FileNotification
 
 if __name__ == "__main__":
 
+    # Show information about current operation
+    logging.basicConfig(level=logging.INFO)
+
     # List of URLs to be checked
     urls = [
-        "https://XXX-iz.impfterminservice.de/impftermine/suche/XXXX-XXXX-XXXX/YYYYY/",
+        "https://XXX-iz.impfterminservice.de/impftermine/suche/XXXX-XXXX-XXXX/YYYYY/"
     ]
 
     # Private key for push notifications via pushsafer.com

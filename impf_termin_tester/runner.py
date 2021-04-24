@@ -10,7 +10,7 @@ class Runner:
         self.notifiers = notifiers
 
         self.wait_time = 5
-        self.interval_time = 5 * 60
+        self.interval_time = 10 * 60
 
     def start(self):
         self._initialize()

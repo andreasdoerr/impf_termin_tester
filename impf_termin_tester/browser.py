@@ -56,9 +56,11 @@ class Browser:
 
         # Check if no appointment text visible
         source = self.driver.page_source
-        if source.find("Derzeit stehen leider keine Termine zur Verfügung"):
+        if source.find("Derzeit stehen leider keine Termine zur Verfügung") > -1:
             return None
-
+        if source.find("Virtueller Warteraum des Impfterminservice") > -1:
+            return None
+            
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()
 

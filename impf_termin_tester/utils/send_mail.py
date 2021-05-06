@@ -144,8 +144,8 @@ if __name__ == "__main__":
     #       of course, you need to put also something into TO - just use same address as FROM for that.
     ok, msg = send_mail(
         mail_from=me,
-        to=[me],
-        bcc=[them, them, them],
+        to=[me,],
+        bcc=[them, them, them,],
         subject="Test send_mail",
         text="Test!",
         mail_server="mail.example.org:587",

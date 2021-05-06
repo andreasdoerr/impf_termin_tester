@@ -56,7 +56,7 @@ class Browser:
 
         # Check if no appointment text visible
         source = self.driver.page_source
-        if source.find("Derzeit stehen leider keine Termine zur Verfügung"):
+        if source.find("Derzeit stehen leider keine Termine zur Verfügung")>=0:
             return None
 
         # Take screenshot

@@ -1,4 +1,5 @@
 import time
+import logging
 
 from datetime import datetime
 
@@ -17,69 +18,64 @@ class Runner:
         self._run()
 
     def _initialize(self):
-        print()
-        print("#" * 80)
-        print(" Setup")
-        print("-" * 80, flush=True)
+        logging.info("#" * 80)
+        logging.info(" Setup")
+        logging.info("-" * 80)
 
         # Initialize browser
-        print(f" - Initialize: Browser ...", end=" ", flush=True)
+        logging.info(f" - Initialize: Browser.")
         self.browser.initialize()
-        print("Done", flush=True)
+        logging.info("   Done")
 
         # Initialize all notification channels
         for notifier in self.notifiers:
-            print(
-                f" - Initialize notification channel: {notifier.name} ...",
-                end=" ",
-                flush=True,
-            )
+            logging.info(f" - Initialize notification channel: {notifier.name}")
             notifier.initialize()
-            print("Done", flush=True)
+            logging.info("   Done")
 
-        print("#" * 80)
-        print("", flush=True)
+        logging.info("#" * 80)
+        logging.info("")
 
     def _run_url(self, url):
         result = self.browser.check_url(url)
 
         if result is None:
-            print("   RESULT: No appointments available.", flush=True)
+            logging.info("   RESULT: No appointments available.")
             return
 
-        print("*" * 80)
-        print("   RESULT: Appointments available", flush=True)
-        print("*" * 80)
+        logging.info("*" * 80)
+        logging.info("   RESULT: Appointments available")
+        logging.info("*" * 80)
 
         for notifier in self.notifiers:
-            print(f" - Sent notification: {notifier.name} ... ", end=" ", flush=True)
+            logging.info(f" - Sent notification: {notifier.name}")
             success = notifier.send_notification(result)
             if success:
-                print("Success.", flush=True)
+                logging.info("   Success.")
             else:
-                print("Failed.", flush=True)
-        print("*" * 80, flush=True)
+                logging.info("   Failed.")
+        logging.info("*" * 80)
 
     def _run(self):
         while True:
-            print("#" * 80)
-            print("Checking websites:")
-            print(datetime.now().strftime("%d.%m.%Y - %H:%M"))
-            print("-" * 80, flush=True)
+            logging.info("#" * 80)
+            logging.info("Checking websites:")
+            logging.info(datetime.now().strftime("%d.%m.%Y - %H:%M"))
+            logging.info("-" * 80)
 
             for i, url in enumerate(self.urls):
                 try:
-                    print(f" - {i+1} of {len(self.urls)}, open: {url}", flush=True)
+                    logging.info(f" - {i+1} of {len(self.urls)}, open: {url}")
                     self._run_url(url)
                 except Exception as e:
-                    print("   Failed", e, flush=True)
+                    logging.info(f"   Failed {e}")
 
                 time.sleep(self.wait_time)
 
-            print("-" * 80, flush=True)
-            print("Checking completed.")
-            print("#" * 80)
-            print("", flush=True)
+            logging.info("-" * 80)
+            logging.info("Checking completed.")
+            logging.info("#" * 80)
+            logging.info("")
 
-            print(f"Wait {self.interval_time // 60}min\n", flush=True)
+            logging.info(f"Wait {self.interval_time // 60}min\n")
             time.sleep(self.interval_time)

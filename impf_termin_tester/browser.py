@@ -59,7 +59,12 @@ class Browser:
         source = self.driver.page_source
         if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
             return None
-
+        if source.find("Virtueller Warteraum des Impfterminservice") > -1:
+            return None
+        if source.find("Wir aktualisieren zurzeit das System. Bitte probieren Sie es in einigen Minuten erneut.") > -1:
+            return None    
+            
+            
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()
 

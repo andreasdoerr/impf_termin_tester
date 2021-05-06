@@ -7,4 +7,4 @@ dependencies:
   - pip:
     - selenium
     - paho-mqtt
-    
+    - notify_run

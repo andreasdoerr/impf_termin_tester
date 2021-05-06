@@ -60,6 +60,9 @@ class Browser:
             return None
         if source.find("Virtueller Warteraum des Impfterminservice") > -1:
             return None
+        if source.find("Wir aktualisieren zurzeit das System. Bitte probieren Sie es in einigen Minuten erneut.") > -1:
+            return None    
+            
             
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()

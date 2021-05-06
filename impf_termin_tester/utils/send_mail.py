@@ -23,9 +23,19 @@ from email.message import EmailMessage
 from email.utils import formatdate, make_msgid
 
 
-def send_mail(*, mail_from, to=None, cc=None, bcc=None, subject,
-              text, html=None,
-              mail_server, login_user=None, login_password=None):
+def send_mail(
+    *,
+    mail_from,
+    to=None,
+    cc=None,
+    bcc=None,
+    subject,
+    text,
+    html=None,
+    mail_server,
+    login_user=None,
+    login_password=None
+):
     """ Create and send a text/plain message
 
     Return a tuple of success or error indicator and message.
@@ -67,37 +77,45 @@ def send_mail(*, mail_from, to=None, cc=None, bcc=None, subject,
 
     msg.set_content(text)
     if html:
-        msg.add_alternative(html, subtype='html')
+        msg.add_alternative(html, subtype="html")
 
-    msg['From'] = mail_from
+    msg["From"] = mail_from
     if to:
-        msg['To'] = to
+        msg["To"] = to
     if cc:
-        msg['CC'] = cc
+        msg["CC"] = cc
     if bcc:
-        msg['BCC'] = bcc
-    msg['Subject'] = subject
-    msg['Date'] = formatdate()
-    msg['Message-ID'] = make_msgid()
-    msg['Auto-Submitted'] = 'auto-generated'  # RFC 3834 section 5
+        msg["BCC"] = bcc
+    msg["Subject"] = subject
+    msg["Date"] = formatdate()
+    msg["Message-ID"] = make_msgid()
+    msg["Auto-Submitted"] = "auto-generated"  # RFC 3834 section 5
 
     # Send the message
     try:
-        logging.debug("trying to send mail (smtp) via smtp server '{0}'".format(mail_server))
-        host, port = (mail_server + ':25').split(':')[:2]
+        logging.debug(
+            "trying to send mail (smtp) via smtp server '{0}'".format(mail_server)
+        )
+        host, port = (mail_server + ":25").split(":")[:2]
         server = smtplib.SMTP(host, int(port))
         try:
             server.ehlo()
             try:  # try to do TLS
-                if server.has_extn('starttls'):
+                if server.has_extn("starttls"):
                     server.starttls()
                     server.ehlo()
                     logging.debug("tls connection to smtp server established")
             except Exception:
-                logging.debug("could not establish a tls connection to smtp server, continuing without tls")
+                logging.debug(
+                    "could not establish a tls connection to smtp server, continuing without tls"
+                )
             # server.set_debuglevel(1)
             if login_user is not None and login_password is not None:
-                logging.debug("trying to log in to smtp server using account '{0}'".format(login_user))
+                logging.debug(
+                    "trying to log in to smtp server using account '{0}'".format(
+                        login_user
+                    )
+                )
                 server.login(login_user, login_password)
             server.send_message(msg)
         finally:
@@ -117,15 +135,21 @@ def send_mail(*, mail_from, to=None, cc=None, bcc=None, subject,
     return True, "Mail sent successfully"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # some testing code you can edit to play with this code by calling it directly like: python3 send_mail.py
     me = '"Joe Doe-Sender" <joe@example.org>'
     them = '"Jane Doe-Receiver" <jane@example.org>'
     # note: if sending to many people, respect their privacy and put them ALL into BCC,
     #       so you do not disclose all their email addresses to all of them!
     #       of course, you need to put also something into TO - just use same address as FROM for that.
-    ok, msg = send_mail(mail_from=me, to=[me, ], bcc=[them, them, them, ],
-                        subject="Test send_mail", text="Test!",
-                        mail_server="mail.example.org:587", login_user="username", login_password="password")
+    ok, msg = send_mail(
+        mail_from=me,
+        to=[me,],
+        bcc=[them, them, them,],
+        subject="Test send_mail",
+        text="Test!",
+        mail_server="mail.example.org:587",
+        login_user="username",
+        login_password="password",
+    )
     print("ok: %r, msg: %r" % (ok, msg))
-

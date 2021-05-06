@@ -1,4 +1,5 @@
 import time
+import logging
 from collections import namedtuple
 from datetime import datetime
 
@@ -35,11 +36,11 @@ class Browser:
         try:
             cookie_button = self.driver.find_element_by_xpath(self.cookie_xpath)
             cookie_button.click()
-            print("   ACTION: Acknowledge cookies.", flush=True)
+            logging.info("   ACTION: Acknowledge cookies.")
             time.sleep(3)
-            print("   ACTION: Reload website ...", end=" ", flush=True)
+            logging.info("   ACTION: Reload website")
             self.driver.get(url)
-            print("Done", flush=True)
+            logging.info("           Done")
             time.sleep(3)
         except NoSuchElementException:
             pass
@@ -47,16 +48,16 @@ class Browser:
         # Click appointment button
         submit_button = self.driver.find_elements_by_xpath(self.button_xpath)
         if len(submit_button) != 1:
-            print(f"   WARNING: Found {len(submit_button)} buttons.", flush=True)
+            logging.info(f"   WARNING: Found {len(submit_button)} buttons.")
             return None
         else:
-            print("   ACTION: Click button.", flush=True)
+            logging.info("   ACTION: Click button.")
             submit_button[0].click()
             time.sleep(3)
 
         # Check if no appointment text visible
         source = self.driver.page_source
-        if source.find("Derzeit stehen leider keine Termine zur Verfügung") > -1:
+        if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
             return None
         if source.find("Virtueller Warteraum des Impfterminservice") > -1:
             return None

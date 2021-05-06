@@ -29,6 +29,9 @@ if __name__ == "__main__":
 
     # Output directory for file dump
     output_dir = "output_folder_path"
+    
+    # MQTT Broker
+    broker = "address_of_your_mqtt_broker"
 
     # Create notifiers
     notifiers = [
@@ -36,6 +39,7 @@ if __name__ == "__main__":
         PushSaferNotification(pushsafer_private_key),
         # OutlookNotification(email),    # Windows only, requiers pywin32
         FileNotification(output_dir),
+        # MQTTNotification(broker)
     ]
 
     # Communication with browser

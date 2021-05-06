@@ -23,6 +23,12 @@ The `impf_termin_tester` package can be installed by running
 pip install -e .
 ```
 
+To use the android notification service run the command 
+``` 
+notify-run register
+```
+as described here: https://pypi.org/project/notify-run/
+
 ## Running
 
 A example script for running the impf-termin-tester is available in [example.py](example.py).

@@ -6,4 +6,5 @@ dependencies:
   - Pillow
   - pip:
     - selenium
+    - notify_run
     

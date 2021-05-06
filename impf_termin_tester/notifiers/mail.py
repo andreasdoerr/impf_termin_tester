@@ -17,7 +17,7 @@ class MailNotification(NotificationService):
     def _send_notification(self, result):
         ok, msg = send_mail(
             mail_from=self.target_email,
-            to=[self.target_email],
+            to=[self.target_email,],
             subject="Appointment available",
             text="Check " + result.url,
             mail_server=self.mail_server,

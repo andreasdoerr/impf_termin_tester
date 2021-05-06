@@ -6,5 +6,5 @@ dependencies:
   - Pillow
   - pip:
     - selenium
+    - paho-mqtt
     - notify_run
-    

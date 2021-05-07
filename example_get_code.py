@@ -28,13 +28,11 @@ if __name__ == "__main__":
         "https://002-iz.impfterminservice.de/impftermine/service?plz=71297",
         "https://005-iz.impfterminservice.de/impftermine/service?plz=71636",
         "https://229-iz.impfterminservice.de/impftermine/service?plz=73037",
-
-
-
     ]
 
     # your age
     age = 35
+    use_tabs = False
 
     # Private key for push notifications via pushsafer.com
     pushsafer_private_key = "your_private_key"
@@ -61,7 +59,7 @@ if __name__ == "__main__":
     # Communication with browser
     binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
     chrome_driver = "/Users/chris/Downloads/chromedriver-2"
-    browser = Browser_Get_Code(binary_location, chrome_driver, age)
+    browser = Browser_Get_Code(binary_location, chrome_driver, age=age, use_tabs=use_tabs)
 
     runner = Runner(urls, browser, notifiers)
     runner.start()

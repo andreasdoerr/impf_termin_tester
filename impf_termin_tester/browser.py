@@ -81,39 +81,40 @@ class Browser:
 
 class Browser_Get_Code(Browser):
     
-    def __init__(self, binary_location, chrome_driver, age):
+    def __init__(self, binary_location, chrome_driver, age, use_tabs=False):
         super().__init__(binary_location, chrome_driver)
 
         self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/span"
-        # self.eligible_button_xpath ="/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[1]/div/div/label[1]"
         self.eligible_button_xpath ="/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[1]/div/div/label[1]/span"
         self.input_age_field_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[3]/div/div/input"
         self.perform_check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[4]/button"
-        # self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/input"
+        
         self.tab_list = []
         self.age = age
+        self.use_tabs = use_tabs
 
 
     def check_url(self, url):
-        has_opened = False
-        for tab in self.tab_list:
-            if tab.url == url:
-                has_opened = True
-                self.driver.switch_to.window(tab.window_handle)
-                break
-        
-        if not has_opened:
-            if len(self.tab_list) > 0:
-                script_str =  '''window.open(\"'''+ url + '''\" ,\"_blank\");'''
-                # self.driver.find_element_by_css_selector("body").send_keys(Keys.COMMAND + "t")
-                self.driver.execute_script(script_str)
-            else:
-                # Open website
-                self.driver.get(url)
+        if self.use_tabs == True:
+            has_opened = False
+            for tab in self.tab_list:
+                if tab.url == url:
+                    has_opened = True
+                    self.driver.switch_to.window(tab.window_handle)
+                    break
+            
+            if not has_opened:
+                if len(self.tab_list) > 0:
+                    script_str =  '''window.open(\"'''+ url + '''\" ,\"_blank\");'''
+                    self.driver.execute_script(script_str)
+                else:
+                    # Open website
+                    self.driver.get(url)
 
-            # self.tab_list.append(self.Tab(url=url, window_handle=self.driver.current_window_handle))
-            self.tab_list.append(self.Tab(url=url, window_handle=self.driver.window_handles[-1]))
-
+                
+                self.tab_list.append(self.Tab(url=url, window_handle=self.driver.window_handles[-1]))
+        else:
+            self.driver.get(url)
         
         
         time.sleep(3)
@@ -133,7 +134,7 @@ class Browser_Get_Code(Browser):
 
         # Click appointment button
         check_button = self.driver.find_elements_by_xpath(self.check_button_xpath)
-        # check_button = self.driver.find_elements_by_xpath("button")
+        
         
 
         if len(check_button) != 1:

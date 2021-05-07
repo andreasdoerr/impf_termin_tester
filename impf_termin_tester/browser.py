@@ -6,11 +6,14 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
+
 
 
 class Browser:
 
     Result = namedtuple("Result", ["source", "screenshot", "time", "url"])
+    Tab = namedtuple("Tab", ["url", "window_handle"])
 
     def __init__(self, binary_location, chrome_driver):
         # Path to chrome executable and chrome driver executable
@@ -77,17 +80,37 @@ class Browser:
 
 
 class Browser_Get_Code(Browser):
+    
     def __init__(self, binary_location, chrome_driver):
         super().__init__(binary_location, chrome_driver)
 
         self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/span"
         # self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/input"
-        
+        self.tab_list = []
 
 
     def check_url(self, url):
-        # Open website
-        self.driver.get(url)
+        has_opened = False
+        for tab in self.tab_list:
+            if tab.url == url:
+                has_opened = True
+                self.driver.switch_to.window(tab.window_handle)
+                break
+        
+        if not has_opened:
+            if len(self.tab_list) > 0:
+                script_str =  '''window.open(\"'''+ url + '''\" ,\"_blank\");'''
+                # self.driver.find_element_by_css_selector("body").send_keys(Keys.COMMAND + "t")
+                self.driver.execute_script(script_str)
+            else:
+                # Open website
+                self.driver.get(url)
+
+            # self.tab_list.append(self.Tab(url=url, window_handle=self.driver.current_window_handle))
+            self.tab_list.append(self.Tab(url=url, window_handle=self.driver.window_handles[-1]))
+
+        
+        
         time.sleep(3)
 
         # Accept cookies if available

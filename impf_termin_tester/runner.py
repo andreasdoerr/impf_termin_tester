@@ -64,6 +64,8 @@ class Runner:
             logging.info(datetime.now().strftime("%d.%m.%Y - %H:%M"))
             logging.info("-" * 80)
 
+      #      self.browser.reset_driver()
+
             for i, url in enumerate(self.urls):
                 try:
                     logging.info(f" - {i+1} of {len(self.urls)}, open: {url}")
@@ -81,5 +83,4 @@ class Runner:
             rand_interval_time = random.randint(0*60, 5*60)
             inteval_this_iteration= rand_interval_time + self.interval_time 
             logging.info(f"Wait {inteval_this_iteration // 60}min\n")
-            self.browser.delete_cookies()
             time.sleep(inteval_this_iteration)

@@ -6,7 +6,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
-
+from fake_useragent import UserAgent
 
 class Browser:
 
@@ -24,9 +24,28 @@ class Browser:
     def initialize(self):
         opts = Options()
         opts.binary_location = self.binary_location
+        ua = UserAgent()
+        user_agent = ua.random
+        logging.info(user_agent)
+        opts.add_argument(f'user-agent={user_agent}')
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
         self.driver.set_window_size(1400, 1050)
 
+    def reset_driver(self):     
+        #try:
+        #    driver.quit()
+        #except: 
+        #    pass
+        options = Options()
+        options.binary_location = self.binary_location
+        options.add_argument("window-size=1400,1050")
+        ua = UserAgent()
+        a = ua.random
+        user_agent = ua.random
+        logging.info(user_agent)
+        options.add_argument(f'user-agent={user_agent}')
+        driver = webdriver.Chrome(options=options, executable_path=self.chrome_driver)
+        
     def delete_cookies(self):
         logging.info("   ACTION: Delete cookies.")
         self.driver.delete_all_cookies()

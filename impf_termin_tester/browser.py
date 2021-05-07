@@ -25,7 +25,7 @@ class Browser:
         opts = Options()
         opts.binary_location = self.binary_location
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
-        self.driver.set_window_size(1400, 1050)
+        self.driver.set_window_size(400, 700)
 
     def check_url(self, url):
         # Open website
@@ -71,3 +71,75 @@ class Browser:
             source=source, screenshot=screenshot, time=current_time, url=url
         )
         return result
+    
+
+
+
+
+class Browser_Get_Code(Browser):
+    def __init__(self, binary_location, chrome_driver):
+        super().__init__(binary_location, chrome_driver)
+
+        self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/span"
+        # self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/input"
+        
+
+
+    def check_url(self, url):
+        # Open website
+        self.driver.get(url)
+        time.sleep(3)
+
+        # Accept cookies if available
+        try:
+            cookie_button = self.driver.find_element_by_xpath(self.cookie_xpath)
+            cookie_button.click()
+            logging.info("   ACTION: Acknowledge cookies.")
+            time.sleep(3)
+            logging.info("   ACTION: Reload website")
+            self.driver.get(url)
+            logging.info("           Done")
+            time.sleep(3)
+        except NoSuchElementException:
+            pass
+
+        # Click appointment button
+        check_button = self.driver.find_elements_by_xpath(self.check_button_xpath)
+        # check_button = self.driver.find_elements_by_xpath("button")
+        
+
+        if len(check_button) != 1:
+            logging.info(f"   WARNING: Found {len(submit_button)} buttons.")
+            return None
+        else:
+            logging.info("   ACTION: Click button.")
+            check_button[0].click()
+            time.sleep(3)
+
+
+        source = self.driver.page_source
+        is_waiting = True
+        while is_waiting == True:
+            time.sleep(1)
+            if source.find("Bitte Warten") < 0:
+                is_waiting = False
+                
+
+        # Check if no appointment text visible
+        source = self.driver.page_source
+        if source.find("Folgende Personen haben mit höchster") < 0:
+            return None
+
+
+        # Take screenshot
+        screenshot = self.driver.get_screenshot_as_base64()
+
+        # Current time
+        current_time = datetime.now()
+
+        # Return result object
+        result = self.Result(
+            source=source, screenshot=screenshot, time=current_time, url=url
+        )
+        return result
+    

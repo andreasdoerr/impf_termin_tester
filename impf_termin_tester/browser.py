@@ -27,6 +27,10 @@ class Browser:
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
         self.driver.set_window_size(1400, 1050)
 
+    def delete_cookies(self):
+        logging.info("   ACTION: Delete cookies.")
+        self.driver.delete_all_cookies()
+
     def check_url(self, url):
         # Open website
         self.driver.get(url)

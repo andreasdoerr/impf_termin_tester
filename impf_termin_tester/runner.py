@@ -1,5 +1,6 @@
 import time
 import logging
+import random
 
 from datetime import datetime
 
@@ -11,7 +12,7 @@ class Runner:
         self.notifiers = notifiers
 
         self.wait_time = 5
-        self.interval_time = 10 * 60
+        self.interval_time = 5 * 60
 
     def start(self):
         self._initialize()
@@ -77,5 +78,8 @@ class Runner:
             logging.info("#" * 80)
             logging.info("")
 
-            logging.info(f"Wait {self.interval_time // 60}min\n")
-            time.sleep(self.interval_time)
+            rand_interval_time = random.randint(0*60, 5*60)
+            inteval_this_iteration= rand_interval_time + self.interval_time 
+            logging.info(f"Wait {inteval_this_iteration // 60}min\n")
+            self.browser.delete_cookies()
+            time.sleep(inteval_this_iteration)

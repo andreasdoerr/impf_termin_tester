@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     # List of URLs to be checked
     urls = [
-        "https://XXX-iz.impfterminservice.de/impftermine/suche/XXXX-XXXX-XXXX/YYYYY/"
+        "https://XXX-iz.impfterminservice.de/impftermine/suche/XXXX-XXXX-XXXX/YYYYY/",
     ]
 
     # Private key for push notifications via pushsafer.com

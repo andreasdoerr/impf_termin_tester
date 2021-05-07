@@ -81,12 +81,17 @@ class Browser:
 
 class Browser_Get_Code(Browser):
     
-    def __init__(self, binary_location, chrome_driver):
+    def __init__(self, binary_location, chrome_driver, age):
         super().__init__(binary_location, chrome_driver)
 
         self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/span"
+        # self.eligible_button_xpath ="/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[1]/div/div/label[1]"
+        self.eligible_button_xpath ="/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[1]/div/div/label[1]/span"
+        self.input_age_field_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[3]/div/div/input"
+        self.perform_check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[4]/button"
         # self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/input"
         self.tab_list = []
+        self.age = age
 
 
     def check_url(self, url):
@@ -150,9 +155,17 @@ class Browser_Get_Code(Browser):
 
         # Check if no appointment text visible
         source = self.driver.page_source
-        if source.find("Folgende Personen haben mit höchster") < 0:
+        if source.find("Gehören Sie einer impfberechtigten Personengruppen an?") < 0:
             return None
 
+        
+        
+        self.driver.find_elements_by_xpath(self.eligible_button_xpath)[0].click()
+        time.sleep(1)
+        self.driver.find_element_by_xpath(self.input_age_field_xpath).send_keys(Keys.BACKSPACE+Keys.BACKSPACE+Keys.BACKSPACE)
+        self.driver.find_element_by_xpath(self.input_age_field_xpath).send_keys(str(age))
+        time.sleep(1)
+        self.driver.find_elements_by_xpath(self.perform_check_button_xpath)[0].click()
 
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()

@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # Communication with browser
     binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
     chrome_driver = "/Users/chris/Downloads/chromedriver-2"
-    browser = Browser_Get_Code(binary_location, chrome_driver)
+    browser = Browser_Get_Code(binary_location, chrome_driver, age)
 
     runner = Runner(urls, browser, notifiers)
     runner.start()

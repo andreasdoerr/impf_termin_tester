@@ -40,7 +40,7 @@ class Browser:
             logging.info("   ACTION: Reload website")
             self.driver.get(url)
             logging.info("           Done")
-            time.sleep(3)
+            time.sleep(2)
         except NoSuchElementException:
             pass
 
@@ -67,7 +67,7 @@ class Browser:
             self.driver.get(url)
         
         #Approve Cookies
-        time.sleep(3)
+        time.sleep(2)
         self.check_cookies(url)
 
     def check_url(self, url):
@@ -116,6 +116,7 @@ class Browser_Get_Code(Browser):
         self.perform_check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[4]/button"
         self.input_email_field_xpath = ""
         self.input_phone_field_xpath = ""
+        self.final_submit_xpath = ""
         
         self.tab_list = []
         self.personal_information = personal_information
@@ -134,38 +135,49 @@ class Browser_Get_Code(Browser):
         else:
             logging.info("   ACTION: Click button.")
             check_button[0].click()
-            time.sleep(3)
-
-
-        source = self.driver.page_source
-        is_waiting = True
-        while is_waiting == True:
             time.sleep(1)
-            if source.find("Bitte Warten") < 0:
+            
+
+        
+        is_waiting = True
+        while is_waiting == True:     
+            source = self.driver.page_source                   
+            if source.find("Bitte warten") < 0:
                 is_waiting = False
+            else:
+                logging.info("   INFO: Waiting for system.")
+            time.sleep(1)
                 
         #Test if eligibility confirmation button is available
         if len(self.driver.find_elements_by_xpath(self.eligible_button_xpath)) == 0: 
             return None
         
+        logging.info("   INFO: Eligibility confirmation available.")
         #Approve eligibility
         self.driver.find_elements_by_xpath(self.eligible_button_xpath)[0].click()
         time.sleep(1)
         
         # Enter age into input field
         # Backspace is necessary if working in tabbed mode and site is not refreshed
+        logging.info("   ACTION: Entering age.")
         self.driver.find_element_by_xpath(self.input_age_field_xpath).send_keys(Keys.BACKSPACE+Keys.BACKSPACE+Keys.BACKSPACE)
         self.driver.find_element_by_xpath(self.input_age_field_xpath).send_keys(str(self.personal_information['age']))
         time.sleep(1)
 
         # Run final check for appointment
+        logging.info("   ACTION: Running final availability check.")
         self.driver.find_elements_by_xpath(self.perform_check_button_xpath)[0].click()
 
         # Enter personal information
+        logging.info("   ACTION: Entering personal information.")
         self.driver.find_element_by_xpath(self.input_email_field_xpath).send_keys(self.personal_information['email'])
         self.driver.find_element_by_xpath(self.input_phone_field_xpath).send_keys(self.personal_information['phone'])
 
+        # Final submission to receive code
+        self.driver.find_elements_by_xpath(self.final_submit_xpath)[0].click()
         
+        logging.info("   Great SUCCESS. Code has been requested")
+
 
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()

@@ -15,7 +15,7 @@ class Browser:
     Result = namedtuple("Result", ["source", "screenshot", "time", "url"])
     Tab = namedtuple("Tab", ["url", "window_handle"])
 
-    def __init__(self, binary_location, chrome_driver):
+    def __init__(self, binary_location, chrome_driver, use_tabs=False):
         # Path to chrome executable and chrome driver executable
         self.binary_location = binary_location
         self.chrome_driver = chrome_driver
@@ -30,11 +30,7 @@ class Browser:
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
         self.driver.set_window_size(400, 700)
 
-    def check_url(self, url):
-        # Open website
-        self.driver.get(url)
-        time.sleep(3)
-
+    def check_cookies(self, url):
         # Accept cookies if available
         try:
             cookie_button = self.driver.find_element_by_xpath(self.cookie_xpath)
@@ -47,6 +43,36 @@ class Browser:
             time.sleep(3)
         except NoSuchElementException:
             pass
+
+    def get_url(self, url):
+        if self.use_tabs == True:
+            has_opened = False
+            for tab in self.tab_list:
+                if tab.url == url:
+                    has_opened = True
+                    self.driver.switch_to.window(tab.window_handle)
+                    break
+            
+            if not has_opened:
+                if len(self.tab_list) > 0:
+                    script_str =  '''window.open(\"'''+ url + '''\" ,\"_blank\");'''
+                    self.driver.execute_script(script_str)
+                else:
+                    # Open website
+                    self.driver.get(url)
+
+                
+                self.tab_list.append(self.Tab(url=url, window_handle=self.driver.window_handles[-1]))
+        else:
+            self.driver.get(url)
+        
+        #Approve Cookies
+        time.sleep(3)
+        self.check_cookies(url)
+
+    def check_url(self, url):
+        # Open website
+        self.get_url(url)
 
         # Click appointment button
         submit_button = self.driver.find_elements_by_xpath(self.button_xpath)
@@ -81,62 +107,27 @@ class Browser:
 
 class Browser_Get_Code(Browser):
     
-    def __init__(self, binary_location, chrome_driver, age, use_tabs=False):
-        super().__init__(binary_location, chrome_driver)
+    def __init__(self, binary_location, chrome_driver, use_tabs=False, personal_information=dict()):
+        super().__init__(binary_location, chrome_driver), use_tabs
 
         self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/span"
         self.eligible_button_xpath ="/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[1]/div/div/label[1]/span"
         self.input_age_field_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[3]/div/div/input"
         self.perform_check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[4]/button"
+        self.input_email_field_xpath = ""
+        self.input_phone_field_xpath = ""
         
         self.tab_list = []
-        self.age = age
+        self.personal_information = personal_information
         self.use_tabs = use_tabs
 
 
     def check_url(self, url):
-        if self.use_tabs == True:
-            has_opened = False
-            for tab in self.tab_list:
-                if tab.url == url:
-                    has_opened = True
-                    self.driver.switch_to.window(tab.window_handle)
-                    break
-            
-            if not has_opened:
-                if len(self.tab_list) > 0:
-                    script_str =  '''window.open(\"'''+ url + '''\" ,\"_blank\");'''
-                    self.driver.execute_script(script_str)
-                else:
-                    # Open website
-                    self.driver.get(url)
-
-                
-                self.tab_list.append(self.Tab(url=url, window_handle=self.driver.window_handles[-1]))
-        else:
-            self.driver.get(url)
+        self.get_url(url)
         
-        
-        time.sleep(3)
-
-        # Accept cookies if available
-        try:
-            cookie_button = self.driver.find_element_by_xpath(self.cookie_xpath)
-            cookie_button.click()
-            logging.info("   ACTION: Acknowledge cookies.")
-            time.sleep(3)
-            logging.info("   ACTION: Reload website")
-            self.driver.get(url)
-            logging.info("           Done")
-            time.sleep(3)
-        except NoSuchElementException:
-            pass
-
-        # Click appointment button
+        # Click first check for eligibility button
         check_button = self.driver.find_elements_by_xpath(self.check_button_xpath)
         
-        
-
         if len(check_button) != 1:
             logging.info(f"   WARNING: Found {len(submit_button)} buttons.")
             return None
@@ -153,20 +144,28 @@ class Browser_Get_Code(Browser):
             if source.find("Bitte Warten") < 0:
                 is_waiting = False
                 
-
-        # Check if no appointment text visible
-        source = self.driver.page_source
-        if source.find("Gehören Sie einer impfberechtigten Personengruppen an?") < 0:
+        #Test if eligibility confirmation button is available
+        if len(self.driver.find_elements_by_xpath(self.eligible_button_xpath)) == 0: 
             return None
-
         
-        
+        #Approve eligibility
         self.driver.find_elements_by_xpath(self.eligible_button_xpath)[0].click()
         time.sleep(1)
+        
+        # Enter age into input field
+        # Backspace is necessary if working in tabbed mode and site is not refreshed
         self.driver.find_element_by_xpath(self.input_age_field_xpath).send_keys(Keys.BACKSPACE+Keys.BACKSPACE+Keys.BACKSPACE)
-        self.driver.find_element_by_xpath(self.input_age_field_xpath).send_keys(str(age))
+        self.driver.find_element_by_xpath(self.input_age_field_xpath).send_keys(str(self.personal_information['age']))
         time.sleep(1)
+
+        # Run final check for appointment
         self.driver.find_elements_by_xpath(self.perform_check_button_xpath)[0].click()
+
+        # Enter personal information
+        self.driver.find_element_by_xpath(self.input_email_field_xpath).send_keys(self.personal_information['email'])
+        self.driver.find_element_by_xpath(self.input_phone_field_xpath).send_keys(self.personal_information['phone'])
+
+        
 
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()

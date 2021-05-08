@@ -32,6 +32,8 @@ if __name__ == "__main__":
 
     # your age
     age = 35
+    email = "c.daniel42@gmail.com"
+    phone = "1702401143"
     use_tabs = False
 
     # Private key for push notifications via pushsafer.com
@@ -59,7 +61,9 @@ if __name__ == "__main__":
     # Communication with browser
     binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
     chrome_driver = "/Users/chris/Downloads/chromedriver-2"
-    browser = Browser_Get_Code(binary_location, chrome_driver, age=age, use_tabs=use_tabs)
+
+    personal_information = dict(age=age, email=email, phone=phone)
+    browser = Browser_Get_Code(binary_location, chrome_driver, use_tabs=use_tabs, personal_information=personal_information)
 
     runner = Runner(urls, browser, notifiers)
     runner.start()

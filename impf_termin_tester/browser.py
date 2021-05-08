@@ -137,17 +137,11 @@ class Browser_Get_Code(Browser):
             check_button[0].click()
             time.sleep(1)
             
-
-        
-        is_waiting = True
-        while is_waiting == True:     
-            source = self.driver.page_source                   
-            if source.find("Bitte warten") < 0:
-                is_waiting = False
-            else:
-                logging.info("   INFO: Waiting for system.")
+        while self.driver.page_source.find("Bitte warten") >= 0:
+            logging.info("   INFO: Waiting for system.")
             time.sleep(1)
-                
+        time.sleep(1)
+        
         #Test if eligibility confirmation button is available
         if len(self.driver.find_elements_by_xpath(self.eligible_button_xpath)) == 0: 
             return None

@@ -136,7 +136,8 @@ class Browser_Get_Code(Browser):
             logging.info("   ACTION: Click button.")
             check_button[0].click()
             time.sleep(1)
-            
+
+        # Wait for the system to check availability    
         while self.driver.page_source.find("Bitte warten") >= 0:
             logging.info("   INFO: Waiting for system.")
             time.sleep(1)
@@ -146,8 +147,9 @@ class Browser_Get_Code(Browser):
         if len(self.driver.find_elements_by_xpath(self.eligible_button_xpath)) == 0: 
             return None
         
-        logging.info("   INFO: Eligibility confirmation available.")
+        
         #Approve eligibility
+        logging.info("   ACTION:  confirmation eligibility.")
         self.driver.find_elements_by_xpath(self.eligible_button_xpath)[0].click()
         time.sleep(1)
         
@@ -169,7 +171,6 @@ class Browser_Get_Code(Browser):
 
         # Final submission to receive code
         self.driver.find_elements_by_xpath(self.final_submit_xpath)[0].click()
-        
         logging.info("   Great SUCCESS. Code has been requested")
 
 

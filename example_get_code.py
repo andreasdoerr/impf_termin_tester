@@ -34,7 +34,7 @@ if __name__ == "__main__":
     age = 35
     email = "c.daniel42@gmail.com"
     phone = "1702401143"
-    use_tabs = False
+    use_tabs = True
 
     # Private key for push notifications via pushsafer.com
     pushsafer_private_key = "your_private_key"

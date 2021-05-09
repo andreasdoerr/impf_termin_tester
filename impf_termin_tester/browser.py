@@ -30,7 +30,7 @@ class Browser:
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
         self.driver.set_window_size(400, 700)
 
-    def _get_result(self):
+    def _get_result(self, url):
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()
 
@@ -109,7 +109,7 @@ class Browser:
             return None
 
         
-        return self._get_result()
+        return self._get_result(url)
     
 
 
@@ -135,7 +135,7 @@ class Browser_Get_Code(Browser):
 
     def check_url(self, url):
         if self.driver.page_source.find("SMS Verifizierung") >= 0:
-            return self._get_result()
+            return self._get_result(url)
 
         self.get_url(url)
         
@@ -188,5 +188,5 @@ class Browser_Get_Code(Browser):
         logging.info("   Great SUCCESS. Code has been requested")
 
 
-        return self._get_result()
+        return self._get_result(url)
     

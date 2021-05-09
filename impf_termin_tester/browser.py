@@ -30,7 +30,7 @@ class Browser:
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
         self.driver.set_window_size(400, 700)
 
-    def _get_result(self, source):
+    def _get_result(self):
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()
 

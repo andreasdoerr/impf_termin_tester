@@ -30,6 +30,23 @@ class Browser:
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
         self.driver.set_window_size(400, 700)
 
+    def _get_result(self, source):
+        # Take screenshot
+        screenshot = self.driver.get_screenshot_as_base64()
+
+        # Current time
+        current_time = datetime.now()
+
+        source = self.driver.page_source
+
+        # Return result object
+        result = self.Result(
+            source=source, screenshot=screenshot, time=current_time, url=url
+        )
+        return result
+
+
+
     def check_cookies(self, url):
         # Accept cookies if available
         try:
@@ -43,6 +60,8 @@ class Browser:
             time.sleep(2)
         except NoSuchElementException:
             pass
+
+
 
     def get_url(self, url):
         if self.use_tabs == True:
@@ -89,17 +108,8 @@ class Browser:
         if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
             return None
 
-        # Take screenshot
-        screenshot = self.driver.get_screenshot_as_base64()
-
-        # Current time
-        current_time = datetime.now()
-
-        # Return result object
-        result = self.Result(
-            source=source, screenshot=screenshot, time=current_time, url=url
-        )
-        return result
+        
+        return self._get_result()
     
 
 
@@ -124,6 +134,9 @@ class Browser_Get_Code(Browser):
 
 
     def check_url(self, url):
+        if self.driver.page_source.find("SMS Verifizierung") >= 0:
+            return self._get_result()
+
         self.get_url(url)
         
         # Click first check for eligibility button
@@ -175,15 +188,5 @@ class Browser_Get_Code(Browser):
         logging.info("   Great SUCCESS. Code has been requested")
 
 
-        # Take screenshot
-        screenshot = self.driver.get_screenshot_as_base64()
-
-        # Current time
-        current_time = datetime.now()
-
-        # Return result object
-        result = self.Result(
-            source=source, screenshot=screenshot, time=current_time, url=url
-        )
-        return result
+        return self._get_result()
     

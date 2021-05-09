@@ -114,9 +114,9 @@ class Browser_Get_Code(Browser):
         self.eligible_button_xpath ="/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[1]/div/div/label[1]/span"
         self.input_age_field_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[3]/div/div/input"
         self.perform_check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[4]/button"
-        self.input_email_field_xpath = ""
-        self.input_phone_field_xpath = ""
-        self.final_submit_xpath = ""
+        self.input_email_field_xpath = "/html/body/app-root/div/app-page-its-check-result/div/div/div[2]/div/div/div/div/app-its-check-success/div/form/div[1]/label/input"
+        self.input_phone_field_xpath = "/html/body/app-root/div/app-page-its-check-result/div/div/div[2]/div/div/div/div/app-its-check-success/div/form/div[2]/label/div/input"
+        self.final_submit_xpath = "/html/body/app-root/div/app-page-its-check-result/div/div/div[2]/div/div/div/div/app-its-check-success/div/form/div[3]/button"
         
         self.tab_list = []
         self.personal_information = personal_information
@@ -170,6 +170,7 @@ class Browser_Get_Code(Browser):
         self.driver.find_element_by_xpath(self.input_phone_field_xpath).send_keys(self.personal_information['phone'])
 
         # Final submission to receive code
+        time.sleep(1)
         self.driver.find_elements_by_xpath(self.final_submit_xpath)[0].click()
         logging.info("   Great SUCCESS. Code has been requested")
 

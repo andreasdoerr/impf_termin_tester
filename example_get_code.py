@@ -32,6 +32,7 @@ if __name__ == "__main__":
 
     # your age
     age = 35
+    # Target for e-mail notifications (used by OutlookNotification, MailNotification)
     email = "c.daniel42@gmail.com"
     phone = "1702401143"
     use_tabs = True
@@ -39,8 +40,6 @@ if __name__ == "__main__":
     # Private key for push notifications via pushsafer.com
     pushsafer_private_key = "your_private_key"
 
-    # Target for e-mail notifications (used by OutlookNotification, MailNotification)
-    email = "your_email_address"
     # Mail Server/Credentials (used by MailNotification)
     mail_server = "mail.example.org:587"
     login_user = "username"

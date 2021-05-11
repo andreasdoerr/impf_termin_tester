@@ -20,9 +20,13 @@ class Browser:
         self.binary_location = binary_location
         self.chrome_driver = chrome_driver
 
+        self.tab_list = []
+        self.use_tabs = use_tabs
+        
         # x-path for elements on the website
         self.cookie_xpath = "/html/body/app-root/div/div/div/div[2]/div[2]/div/div[2]/a"
         self.button_xpath = "/html/body/app-root/div/app-page-its-search/div/div/div[2]/div/div/div[5]/div/div[1]/div[2]/div[2]/button"
+        
 
     def initialize(self):
         opts = Options()
@@ -101,7 +105,7 @@ class Browser:
         else:
             logging.info("   ACTION: Click button.")
             submit_button[0].click()
-            time.sleep(3)
+            time.sleep(5)
 
         # Check if no appointment text visible
         source = self.driver.page_source
@@ -128,9 +132,9 @@ class Browser_Get_Code(Browser):
         self.input_phone_field_xpath = "/html/body/app-root/div/app-page-its-check-result/div/div/div[2]/div/div/div/div/app-its-check-success/div/form/div[2]/label/div/input"
         self.final_submit_xpath = "/html/body/app-root/div/app-page-its-check-result/div/div/div[2]/div/div/div/div/app-its-check-success/div/form/div[3]/button"
         
-        self.tab_list = []
+        
         self.personal_information = personal_information
-        self.use_tabs = use_tabs
+        
 
 
     def check_url(self, url):

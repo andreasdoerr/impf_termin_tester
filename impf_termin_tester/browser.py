@@ -26,7 +26,7 @@ class Browser:
         # x-path for elements on the website
         self.cookie_xpath = "/html/body/app-root/div/div/div/div[2]/div[2]/div/div[2]/a"
         self.button_xpath = "/html/body/app-root/div/app-page-its-search/div/div/div[2]/div/div/div[5]/div/div[1]/div[2]/div[2]/button"
-        
+        self.cancel_xpath = "/html/body/app-root/div/app-page-its-search/app-its-search-slots-modal/div/div/div/div[2]/div/div/form/div[2]/button[2]"
 
     def initialize(self):
         opts = Options()
@@ -97,6 +97,10 @@ class Browser:
         # Open website
         self.get_url(url)
 
+        if len(self.driver.find_elements_by_xpath(self.button_xpath)) == 0 and \
+            self.driver.page_source.find("Warteraum") < 0:
+            self.driver.get(url)
+
         # Click appointment button
         submit_button = self.driver.find_elements_by_xpath(self.button_xpath)
         if len(submit_button) != 1:
@@ -110,6 +114,7 @@ class Browser:
         # Check if no appointment text visible
         source = self.driver.page_source
         if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
+            self.driver.find_element_by_xpath(self.cancel_xpath).click()
             return None
 
         
@@ -122,7 +127,7 @@ class Browser:
 class Browser_Get_Code(Browser):
     
     def __init__(self, binary_location, chrome_driver, use_tabs=False, personal_information=dict()):
-        super().__init__(binary_location, chrome_driver), use_tabs
+        super().__init__(binary_location, chrome_driver, use_tabs)
 
         self.check_button_xpath = "/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[2]/div/div/label[2]/span"
         self.eligible_button_xpath ="/html/body/app-root/div/app-page-its-login/div/div/div[2]/app-its-login-user/div/div/app-corona-vaccination/div[3]/div/div/div/div[2]/div/app-corona-vaccination-no/form/div[1]/div/div/label[1]/span"

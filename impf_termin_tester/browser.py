@@ -148,15 +148,19 @@ class Browser:
             logging.info("   ACTION: Click button.")
             submit_button[0].click()
             time.sleep(5)
-
+        
+        while self.driver.page_source.find("Termine werden gesucht") >= 0:
+            logging.info("   Info: Waiting for system to find appointment.")
+            time.sleep(1)
+            
         # Check if no appointment text visible
-        # source = self.driver.page_source
-        # if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
-        #     # self.driver.find_element_by_xpath(self.cancel_xpath).click()
-        #     return None
-        choose_button = self.driver.find_elements_by_xpath(self.button_choose_xpath)
-        if len(choose_button) == 0 or (choose_button[0].is_enabled() == False):      
+        source = self.driver.page_source
+        if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
+            # self.driver.find_element_by_xpath(self.cancel_xpath).click()
             return None
+        # choose_button = self.driver.find_elements_by_xpath(self.button_choose_xpath)
+        # if len(choose_button) == 0 or (choose_button[0].is_enabled() == False):      
+        #     return None
         
         return self._get_result(url)
     

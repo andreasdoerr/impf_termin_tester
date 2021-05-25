@@ -12,7 +12,8 @@ class NotificationService:
     def send_notification(self, result):
         try:
             return self._send_notification(result)
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     @abc.abstractmethod

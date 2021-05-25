@@ -5,13 +5,15 @@ from datetime import datetime
 
 
 class Runner:
-    def __init__(self, urls, browser, notifiers):
+    def __init__(self, urls, browser, notifiers, test_notifiers=False):
         self.urls = urls
         self.browser = browser
         self.notifiers = notifiers
+        
+        self.test_notifiers = test_notifiers
 
         self.wait_time = 5
-        self.interval_time = 10 * 60
+        self.interval_time = 1 * 60
 
     def start(self):
         self._initialize()
@@ -33,8 +35,22 @@ class Runner:
             notifier.initialize()
             logging.info("   Done")
 
+        # Test all notification channels (if enabled)
+        if self.test_notifiers:
+            result = self.browser.get_dummy_result()
+            self.sent_notifications(result, "Test notification channel") 
+
         logging.info("#" * 80)
         logging.info("")
+        
+    def sent_notifications(self, result, label="Sent notification"):
+        for notifier in self.notifiers:
+            logging.info(f" - {label}: {notifier.name}")
+            success = notifier.send_notification(result)
+            if success:
+                logging.info("   Success.")
+            else:
+                logging.info("   Failed.")
 
     def _run_url(self, url):
         result = self.browser.check_url(url)
@@ -46,14 +62,7 @@ class Runner:
         logging.info("*" * 80)
         logging.info("   RESULT: Appointments available")
         logging.info("*" * 80)
-
-        for notifier in self.notifiers:
-            logging.info(f" - Sent notification: {notifier.name}")
-            success = notifier.send_notification(result)
-            if success:
-                logging.info("   Success.")
-            else:
-                logging.info("   Failed.")
+        self.sent_notifications(result)
         logging.info("*" * 80)
 
     def _run(self):

@@ -76,3 +76,29 @@ class Browser:
             source=source, screenshot=screenshot, time=current_time, url=url
         )
         return result
+
+    def get_dummy_result(self):
+        
+        # Open Google as dummy website
+        url = "http://www.google.com"
+        
+        # Open website
+        self.driver.get(url)
+        time.sleep(3)
+        
+        # Get page source
+        source = self.driver.page_source
+        
+        # Take screenshot
+        screenshot = self.driver.get_screenshot_as_base64()
+
+        # Current time
+        current_time = datetime.now()
+
+        # Return result object
+        result = self.Result(
+            source=source, screenshot=screenshot, time=current_time, url=url
+        )
+        
+        return result
+

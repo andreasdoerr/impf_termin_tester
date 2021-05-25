@@ -21,7 +21,7 @@ class Browser:
         self.tabs = dict()
         self.use_tabs = use_tabs
         
-        self.found = defaultdict(bool)
+        self.found_time = dict()
         self.repeated_notifications = False
 
         # x-path for elements on the website
@@ -45,6 +45,7 @@ class Browser:
         self.time_loading = 2
         self.time_search_max = 10
         self.time_search_interval = 1
+        self.time_keep_result = 12 * 60
         
 
     def initialize(self):
@@ -162,6 +163,14 @@ class Browser:
     
     def _get_result(self, url):
         
+        # Reset previous found if long ago
+        if url in self.found_time:
+            t0 = self.found_time[url]
+            t1 = datetime.now()
+            delta = t1 - t0
+            if delta.total_seconds() > self.time_keep_result:
+                self.found_time[url] = None
+        
         # Get page source
         source = self.driver.page_source
         # Take screenshot
@@ -174,12 +183,14 @@ class Browser:
             source=source, screenshot=screenshot, time=current_time, url=url
         )
         
-        if self.found[url]:
+        # If previously found, only return result again if requested
+        if url in self.found_time:
             if self.repeated_notifications:
                 return result
             else:
                 return None
         
+        # Not yet found, return result in any case
         self.found[url] = True
         return result
 

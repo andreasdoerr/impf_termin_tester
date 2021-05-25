@@ -169,7 +169,7 @@ class Browser:
             t1 = datetime.now()
             delta = t1 - t0
             if delta.total_seconds() > self.time_keep_result:
-                self.found_time[url] = None
+                self.found_time.pop(url)
         
         # Get page source
         source = self.driver.page_source
@@ -191,7 +191,7 @@ class Browser:
                 return None
         
         # Not yet found, return result in any case
-        self.found[url] = True
+        self.found[url] = datetime.now()
         return result
 
     def _handle_cookies(self, url):

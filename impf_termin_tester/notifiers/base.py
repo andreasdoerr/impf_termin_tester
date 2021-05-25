@@ -1,4 +1,5 @@
 import abc
+import logging
 
 
 class NotificationService:
@@ -13,7 +14,7 @@ class NotificationService:
         try:
             return self._send_notification(result)
         except Exception as e:
-            print(e)
+            logging.error(f"   Error: {e}")
             return False
 
     @abc.abstractmethod

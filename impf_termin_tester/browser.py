@@ -38,21 +38,6 @@ class Browser:
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
         self.driver.set_window_size(1400, 1050)
 
-    def _get_result(self, url):
-        # Take screenshot
-        screenshot = self.driver.get_screenshot_as_base64()
-
-        # Current time
-        current_time = datetime.now()
-
-        source = self.driver.page_source
-
-        # Return result object
-        result = self.Result(
-            source=source, screenshot=screenshot, time=current_time, url=url
-        )
-        return result
-
     def check_cookies(self, url):
         # Accept cookies if available
         try:
@@ -166,22 +151,32 @@ class Browser:
         return self._get_result(url)
 
     def get_dummy_result(self):
-
         # Open Google as dummy website
         url = "http://www.google.com"
-
-        # Open website
-        self.driver.get(url)
-        time.sleep(3)
-
+        
+        # Load dummy website
+        self.get_url(url)
+        
+        # Return result dict
+        return self._get_result(url)
+    
+    def _get_result(self, url):
         # Get page source
         source = self.driver.page_source
-
         # Take screenshot
         screenshot = self.driver.get_screenshot_as_base64()
+        # Current time
+        current_time = datetime.now()
+
+        # Return result object
+        result = self.Result(
+            source=source, screenshot=screenshot, time=current_time, url=url
+        )
+        return result
 
 
 class Browser_Get_Code(Browser):
+    
     def __init__(
         self,
         binary_location,

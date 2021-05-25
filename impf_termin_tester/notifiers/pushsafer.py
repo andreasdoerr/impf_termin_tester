@@ -1,4 +1,5 @@
 import urllib3
+import logging
 
 from impf_termin_tester.notifiers import NotificationService
 
@@ -54,4 +55,8 @@ class PushSaferNotification(NotificationService):
             "p": "data:image/png;base64," + result.screenshot,
         }
         request = self.https.request("POST", self.pushsafer_url, fields=post_fields)
+
+        if not request.status == 200:
+            logging.error(f"   Pushsafer response not ok: {request.status}, {request.data}.")
+            
         return request.status == 200

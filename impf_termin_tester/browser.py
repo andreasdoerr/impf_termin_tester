@@ -158,14 +158,27 @@ class Browser:
         if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
             # self.driver.find_element_by_xpath(self.cancel_xpath).click()
             return None
-        # choose_button = self.driver.find_elements_by_xpath(self.button_choose_xpath)
-        # if len(choose_button) == 0 or (choose_button[0].is_enabled() == False):      
-        #     return None
-        
+        if source.find("Virtueller Warteraum des Impfterminservice") > -1:
+            return None
+        if source.find("Wir aktualisieren zurzeit das System. Bitte probieren Sie es in einigen Minuten erneut.") > -1:
+            return None    
+            
         return self._get_result(url)
-    
 
-
+    def get_dummy_result(self):
+        
+        # Open Google as dummy website
+        url = "http://www.google.com"
+        
+        # Open website
+        self.driver.get(url)
+        time.sleep(3)
+        
+        # Get page source
+        source = self.driver.page_source
+        
+        # Take screenshot
+        screenshot = self.driver.get_screenshot_as_base64()
 
 
 class Browser_Get_Code(Browser):
@@ -267,3 +280,12 @@ class Browser_Get_Code(Browser):
 
         return self._get_result(url)
     
+=======
+        # Return result object
+        result = self.Result(
+            source=source, screenshot=screenshot, time=current_time, url=url
+        )
+        
+        return result
+
+>>>>>>> master

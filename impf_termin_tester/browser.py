@@ -1,6 +1,6 @@
 import time
 import logging
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from datetime import datetime
 
 from selenium import webdriver
@@ -12,15 +12,17 @@ from selenium.webdriver.common.keys import Keys
 class Browser:
 
     Result = namedtuple("Result", ["source", "screenshot", "time", "url"])
-    Tab = namedtuple("Tab", ["url", "window_handle"])
 
-    def __init__(self, binary_location, chrome_driver, use_tabs=False):
+    def __init__(self, binary_location, chrome_driver, use_tabs=True):
         # Path to chrome executable and chrome driver executable
         self.binary_location = binary_location
         self.chrome_driver = chrome_driver
 
-        self.tab_list = []
+        self.tabs = dict()
         self.use_tabs = use_tabs
+        
+        self.found = defaultdict(bool)
+        self.repeated_notifications = False
 
         # x-path for elements on the website
         self.cookie_xpath = "/html/body/app-root/div/div/div/div[2]/div[2]/div/div[2]/a"
@@ -31,136 +33,135 @@ class Browser:
         self.select_center_xpath = "/html/body/app-root/div/app-page-its-center/div/div[2]/div/div/div/div/form/div[3]/app-corona-vaccination-center/div[2]/label/span[2]/span[1]/span/span[1]"
         self.select_center_xpath = "/html/body/app-root/div/app-page-its-center/div/div[2]/div/div/div/div/form/div[3]/app-corona-vaccination-center/div[2]/label/span[2]/span[1]/span"
         self.goto_center_xpath = "/html/body/app-root/div/app-page-its-center/div/div[2]/div/div/div/div/form/div[4]/button"
+        
+        # Strings displayed if no appointment is available
+        self.no_appointment_messages = [
+            "Derzeit stehen leider keine Termine zur Verfügung",
+            "Virtueller Warteraum des Impfterminservice",
+            "Wir aktualisieren zurzeit das System. Bitte probieren Sie es in einigen Minuten erneut.",
+        ]
+        
+        # Wait time for loading a new page
+        self.time_loading = 2
+        self.time_search_max = 10
+        self.time_search_interval = 1
+        
 
     def initialize(self):
         opts = Options()
         opts.binary_location = self.binary_location
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
-        self.driver.set_window_size(1400, 1050)
+        self.driver.set_window_size(1400, 1050)         
 
-    def check_cookies(self, url):
-        # Accept cookies if available
-        try:
-            cookie_button = self.driver.find_element_by_xpath(self.cookie_xpath)
-            cookie_button.click()
-            logging.info("   ACTION: Acknowledge cookies.")
-            time.sleep(3)
-            logging.info("   ACTION: Reload website")
-            self.driver.get(url)
-            logging.info("           Done")
-            time.sleep(2)
-        except NoSuchElementException:
-            pass
-
-    def get_url(self, url):
-        if self.use_tabs == True:
-            has_opened = False
-            for tab in self.tab_list:
-                if tab.url == url:
-                    has_opened = True
-                    self.driver.switch_to.window(tab.window_handle)
-                    break
-
-            if not has_opened:
-                if len(self.tab_list) > 0:
-                    script_str = '''window.open(\"''' + url + """\" ,\"_blank\");"""
-                    self.driver.execute_script(script_str)
-                self.tab_list.append(
-                    self.Tab(url=url, window_handle=self.driver.window_handles[-1])
-                )
-
-            reload_site = True
-            # Open website
-            if self.driver.page_source.find("Warteraum") > 0:
-                reload_site = False
-            # if self.driver.page_source.find("Terminsuche") >= 0 and \
-            #         self.driver.page_source.find("Derzeit stehen leider keine Termine zur Verfügung") < 0:
-            #     reload_site = False
-            choose_button = self.driver.find_elements_by_xpath(self.button_choose_xpath)
-            if len(choose_button) > 0 and choose_button[0].is_enabled():
-                reload_site = False
-            if self.driver.page_source.find("00min 00s"):
-                reload_site = True
-
-            if reload_site == True:
-                logging.info("   INFO: Loading URL.")
-                self.driver.get(url)
-            else:
-                logging.info("   INFO: Waiting for system.")
-        else:
-            self.driver.get(url)
-
-        # Approve Cookies
-        time.sleep(2)
-        self.check_cookies(url)
-
-    ## Get URL For Appointment
     def check_url(self, url):
-        # Open website
-        self.get_url(url)
-        time.sleep(5)
+        """ Check if appointment is available
+        
 
-        # Catch redirect to landing page
-        if len(self.driver.find_elements_by_xpath(self.select_bw_xpath)) > 0:
-            logging.info("   INFO: Redirect from landing page.")
-            self.driver.find_elements_by_xpath(self.select_bw_xpath)[0].click()
-            self.driver.find_elements_by_xpath(self.select_bw_xpath)[0].send_keys(
-                Keys.ENTER
-            )
-            self.driver.find_elements_by_xpath(self.select_center_xpath)[0].click()
-            self.driver.find_elements_by_xpath(self.select_center_xpath)[0].send_keys(
-                Keys.ENTER
-            )
-            self.driver.find_elements_by_xpath(self.goto_center_xpath)[0].click()
-            self.get_url(url)
-            time.sleep(5)
+        Parameters
+        ----------
+        url : string
+            URL for appointment check (including the registration code)
 
-        choose_button = self.driver.find_elements_by_xpath(self.button_choose_xpath)
-        if len(choose_button) > 0 and choose_button[0].is_enabled():
-            return self._get_result(url)
+        Returns
+        -------
+        None or dict
+            Returns None if no appointment is available. Otherwise a result dict
+            is returned with page-source, time, screenshot and url.
 
-        # Click appointment button
-        submit_button = self.driver.find_elements_by_xpath(self.button_xpath)
-        if len(submit_button) != 1:
-            logging.info(f"   WARNING: Found {len(submit_button)} buttons.")
-            return None
-        else:
+        """
+        # Open URL in browser
+        self._open_url(url)
+        
+        # Handle cookie acceptance window
+        self._handle_cookies(url)
+        
+        # Handle unwanted redirect to main website
+        self._handle_redirect(url)
+        
+        # Check if appointments are available for selection
+        if self.driver.find_elements_by_xpath(self.button_choose_xpath):
+            choose_button = self.driver.find_element_by_xpath(self.button_choose_xpath)
+            if choose_button.is_enabled():
+                return self._get_result(url)
+
+        # Click button to check for appointments
+        if self.driver.find_elements_by_xpath(self.button_xpath):
+            submit_button = self.driver.find_element_by_xpath(self.button_xpath)
             logging.info("   ACTION: Click button.")
-            submit_button[0].click()
-            time.sleep(5)
+            submit_button.click()
+            time.sleep(2)
 
+        # Wait for system to display appointments
+        time_waited = 0
         while self.driver.page_source.find("Termine werden gesucht") >= 0:
             logging.info("   Info: Waiting for system to find appointment.")
-            time.sleep(1)
+            time.sleep(self.time_search_interval)
+            time_waited += self.time_search_interval
+            if time_waited > self.time_search_max:
+                logging.info("   Info: Maximum waiting time exceeded.")
+                break
 
-        # Check if no appointment text visible
+        # Return None if website shows no available appointments
         source = self.driver.page_source
-        if source.find("Derzeit stehen leider keine Termine zur Verfügung") >= 0:
-            # self.driver.find_element_by_xpath(self.cancel_xpath).click()
-            return None
-        if source.find("Virtueller Warteraum des Impfterminservice") > -1:
-            return None
-        if (
-            source.find(
-                "Wir aktualisieren zurzeit das System. Bitte probieren Sie es in einigen Minuten erneut."
-            )
-            > -1
-        ):
-            return None
+        for message in self.no_appointment_messages:
+            if source.find(message) >= 0:
+                return None
 
         return self._get_result(url)
 
-    def get_dummy_result(self):
-        # Open Google as dummy website
-        url = "http://www.google.com"
+    def get_dummy_result(self, dummy_url="http://www.google.com"):       
+        """ Create result tuple for a dummy website
+        """
         
         # Load dummy website
-        self.get_url(url)
-        
+        self._open_url(dummy_url)
         # Return result dict
-        return self._get_result(url)
+        return self._get_result(dummy_url)
+  
+    def _switch_to_url(self, url):
+        """ Switch to the tab of a URL 
+        
+        If tabs are disabled the URL is opened in the current window.
+        If no tab is opened for this URL, a new one is created.
+        """
+        
+        # Tabs are disabled, open URL in current window
+        if not self.use_tabs:
+            self._open_url(url)
+            return
+            
+        # Check if tab for URL is available
+        if url in self.tabs:
+            self.driver.switch_to.window(self.tabs[url])
+            
+    def _open_url(self, url):
+        """ Open a given URL in the browser 
+        
+        If tabs are enabled, each URL is opened in a separate window.
+        If the URL is already opened in a tab, this tab is reused.
+        """
+        
+        # Open URL in current window if use of tabs is disabled
+        if not self.use_tabs:
+            self.driver.get(url)
+            time.sleep(self.time_loading)
+            return
+        
+        if url in self.tabs:
+            # Switch to existing tab if URL has been opened before
+            self.driver.switch_to.window(self.tabs[url])
+            self.driver.get(url)
+        else:
+            # Create new tab if URL has not been opened before
+            script_str = f"window.open(\"{url}\" ,\"_blank\");"
+            self.driver.execute_script(script_str)
+            self.tabs[url] = self.driver.window_handles[-1]
+            self._open_url(url)
+            
+        time.sleep(self.time_loading)
     
     def _get_result(self, url):
+        
         # Get page source
         source = self.driver.page_source
         # Take screenshot
@@ -172,8 +173,56 @@ class Browser:
         result = self.Result(
             source=source, screenshot=screenshot, time=current_time, url=url
         )
+        
+        if self.found[url]:
+            if self.repeated_notifications:
+                return result
+            else:
+                return None
+        
+        self.found[url] = True
         return result
 
+    def _handle_cookies(self, url):
+        # Accept cookies if available
+        try:        
+            cookie_button = self.driver.find_element_by_xpath(self.cookie_xpath)
+            
+            logging.info("   ACTION: Acknowledge cookies.")
+            cookie_button.click()
+            time.sleep(1)
+            
+            logging.info("   ACTION: Reload desired website")
+            self._open_url(url)
+            logging.info("           Done")
+        except NoSuchElementException:
+            pass
+        
+    def _handle_redirect(self, url):
+        """ Handle sporadic redirect to main website """
+        try:
+            state_dropdown = self.driver.find_element_by_xpath(self.select_bw_xpath)
+            center_dropdown = self.driver.find_element_by_xpath(self.select_center_xpath)
+            goto_button = self.driver.find_element_by_xpath(self.goto_center_xpath)
+            
+            logging.info("   ACTION: Found redirection to main website.")
+
+            # Select random center            
+            state_dropdown.click()
+            state_dropdown.send_keys(Keys.ENTER)
+            center_dropdown.click()
+            center_dropdown.send_keys(Keys.ENTER)
+            goto_button.click()
+            
+            logging.info("   ACTION: Reload desired website")
+            self._open_url(url)
+            logging.info("           Done")
+        except NoSuchElementException:
+            pass
+        
+    def _page_contains(self, text):
+        return self.driver.page_source.find(text) >= 0
+    
 
 class Browser_Get_Code(Browser):
     
@@ -196,44 +245,28 @@ class Browser_Get_Code(Browser):
 
         self.personal_information = personal_information
 
-    def get_url(self, url):
-        if self.use_tabs == True:
-            has_opened = False
-            for tab in self.tab_list:
-                if tab.url == url:
-                    has_opened = True
-                    self.driver.switch_to.window(tab.window_handle)
-                    break
-
-            if not has_opened:
-                if len(self.tab_list) > 0:
-                    script_str = '''window.open(\"''' + url + """\" ,\"_blank\");"""
-                    self.driver.execute_script(script_str)
-                else:
-                    # Open website
-                    self.driver.get(url)
-
-                self.tab_list.append(
-                    self.Tab(url=url, window_handle=self.driver.window_handles[-1])
-                )
-        else:
-            self.driver.get(url)
-
-        # Approve Cookies
-        time.sleep(2)
-        self.check_cookies(url)
-
     def check_url(self, url):
-        if self.driver.page_source.find("SMS Verifizierung") >= 0:
+        
+        # Switch to corresponding tab        
+        self._switch_to_url(url)
+        if self._page_contains("SMS Verifizierung"):
+            logging.info(f"   Please enter the SMS verification code.")
             return self._get_result(url)
 
-        self.get_url(url)
+        # Open URL in browser
+        self._open_url(url)
+        
+        # Handle cookie acceptance window
+        self._handle_cookies(url)
+        
+        # Handle unwanted redirect to main website
+        self._handle_redirect(url)
 
         # Click first check for eligibility button
         check_button = self.driver.find_elements_by_xpath(self.check_button_xpath)
 
         if len(check_button) != 1:
-            logging.info(f"   WARNING: Found {len(submit_button)} buttons.")
+            logging.info(f"   WARNING: Found {len(check_button)} buttons.")
             return None
         else:
             logging.info("   ACTION: Click button.")

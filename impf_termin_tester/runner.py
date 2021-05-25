@@ -39,6 +39,8 @@ class Runner:
         if self.test_notifiers:
             result = self.browser.get_dummy_result()
             self.sent_notifications(result, "Test notification channel")
+        else:
+            logging.info(" - Notification channel test disabled.")
 
         logging.info("#" * 80)
         logging.info("")

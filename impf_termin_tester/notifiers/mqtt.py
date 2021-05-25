@@ -11,9 +11,13 @@ class MQTTNotification(NotificationService):
         self.mqtt_broker = broker
 
     def initialize(self):
-        self.mqtt_client.connect(self.mqtt_broker, port=1883, keepalive=60, bind_address="")
+        self.mqtt_client.connect(
+            self.mqtt_broker, port=1883, keepalive=60, bind_address=""
+        )
 
     def _send_notification(self, result):
         mqtt_payload = "Appointment available: " + result.url
-        ret = self.mqtt_client.publish(self.mqtt_topic, mqtt_payload, qos=0, retain=False)
+        ret = self.mqtt_client.publish(
+            self.mqtt_topic, mqtt_payload, qos=0, retain=False
+        )
         return True

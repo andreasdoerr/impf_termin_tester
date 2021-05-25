@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     # Create notifiers
     notifiers = [
-        AndroidNotification(), # See https://pypi.org/project/notify-run/ to setup the library, i.e., run ```notify-run register```
+        AndroidNotification(),  # See https://pypi.org/project/notify-run/ to setup the library, i.e., run ```notify-run register```
         # MailNotification(email, mail_server, login_user, login_password),
         # PushSaferNotification(pushsafer_private_key),
         # OutlookNotification(email),    # Windows only, requiers pywin32
@@ -62,7 +62,12 @@ if __name__ == "__main__":
     chrome_driver = "/Users/chris/Downloads/chromedriver-2"
 
     personal_information = dict(age=age, email=email, phone=phone)
-    browser = Browser_Get_Code(binary_location, chrome_driver, use_tabs=use_tabs, personal_information=personal_information)
+    browser = Browser_Get_Code(
+        binary_location,
+        chrome_driver,
+        use_tabs=use_tabs,
+        personal_information=personal_information,
+    )
 
     runner = Runner(urls, browser, notifiers)
     runner.start()

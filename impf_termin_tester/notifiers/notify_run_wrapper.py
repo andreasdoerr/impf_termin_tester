@@ -15,7 +15,7 @@ class AndroidNotification(NotificationService):
 
     def initialize(self):
         self.notifier.send("Impftermin Startup Test Message")
-        
-    def _send_notification(self, result):        
+
+    def _send_notification(self, result):
         self.notifier.send(result.url)
         return True

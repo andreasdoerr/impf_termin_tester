@@ -9,7 +9,7 @@ class Runner:
         self.urls = urls
         self.browser = browser
         self.notifiers = notifiers
-        
+
         self.test_notifiers = test_notifiers
 
         self.wait_time = 5
@@ -38,11 +38,11 @@ class Runner:
         # Test all notification channels (if enabled)
         if self.test_notifiers:
             result = self.browser.get_dummy_result()
-            self.sent_notifications(result, "Test notification channel") 
+            self.sent_notifications(result, "Test notification channel")
 
         logging.info("#" * 80)
         logging.info("")
-        
+
     def sent_notifications(self, result, label="Sent notification"):
         for notifier in self.notifiers:
             logging.info(f" - {label}: {notifier.name}")

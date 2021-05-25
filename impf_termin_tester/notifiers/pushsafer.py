@@ -57,6 +57,8 @@ class PushSaferNotification(NotificationService):
         request = self.https.request("POST", self.pushsafer_url, fields=post_fields)
 
         if not request.status == 200:
-            logging.error(f"   Pushsafer response not ok: {request.status}, {request.data}.")
-            
+            logging.error(
+                f"   Pushsafer response not ok: {request.status}, {request.data}."
+            )
+
         return request.status == 200

@@ -36,7 +36,7 @@ class Browser:
         opts = Options()
         opts.binary_location = self.binary_location
         self.driver = webdriver.Chrome(options=opts, executable_path=self.chrome_driver)
-        self.driver.set_window_size(400, 700)
+        self.driver.set_window_size(1400, 1050)
 
     def _get_result(self, url):
         # Take screenshot

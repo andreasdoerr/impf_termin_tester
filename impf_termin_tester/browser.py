@@ -191,7 +191,7 @@ class Browser:
                 return None
         
         # Not yet found, return result in any case
-        self.found[url] = datetime.now()
+        self.found_time[url] = datetime.now()
         return result
 
     def _handle_cookies(self, url):

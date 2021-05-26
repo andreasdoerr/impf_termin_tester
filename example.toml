@@ -1,0 +1,17 @@
+
+# This is an example config file with dummy URLs
+# ATTENTION: Please fill in your valid URLs
+
+# List of vaccination center URLs, each center is checked for available registration codes
+center_urls = [
+    "https://XXX-iz.impfterminservice.de/impftermine/service?plz=XXXXX",      # URL 1
+    "https://XXX-iz.impfterminservice.de/impftermine/service?plz=XXXXX",      # URL 2
+    "https://XXX-iz.impfterminservice.de/impftermine/service?plz=XXXXX",      # URL 3
+]
+
+
+# List of appointment URLs with your registration code
+appointment_urls = [
+    "https://XXX-iz.impfterminservice.de/impftermine/suche/XXXX-XXXX-XXXX/XXXXX",      # URL 1
+    "https://XXX-iz.impfterminservice.de/impftermine/suche/XXXX-XXXX-XXXX/XXXXX",      # URL 2
+]
